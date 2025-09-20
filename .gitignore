@@ -1,0 +1,148 @@
+# Compiled class fileHELP.md
+
+*.classtarget/
+
+.mvn/wrapper/maven-wrapper.jar
+
+# Log file!**/src/main/**/target/
+
+*.log!**/src/test/**/target/
+
+
+
+# BlueJ files### STS ###
+
+*.ctxt.apt_generated
+
+.classpath
+
+# Mobile Tools for Java (J2ME).factorypath
+
+.mtj.tmp/.project
+
+.settings
+
+# Package Files #.springBeans
+
+*.jar.sts4-cache
+
+*.war
+
+*.nar### IntelliJ IDEA ###
+
+*.ear.idea
+
+*.zip*.iws
+
+*.tar.gz*.iml
+
+*.rar*.ipr
+
+
+
+# Virtual machine crash logs### NetBeans ###
+
+hs_err_pid*/nbproject/private/
+
+/nbbuild/
+
+# Maven/dist/
+
+target//nbdist/
+
+pom.xml.tag/.nb-gradle/
+
+pom.xml.releaseBackupbuild/
+
+pom.xml.versionsBackup!**/src/main/**/build/
+
+pom.xml.next!**/src/test/**/build/
+
+release.properties
+
+dependency-reduced-pom.xml### VS Code ###
+
+buildNumber.properties.vscode/
+
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+
+# Eclipse
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# VS Code
+.vscode/
+
+# Spring Boot
+application-local.properties
+application-dev.properties
+application-prod.properties
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Redis dumps
+dump.rdb
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Secrets and sensitive files
+secrets/
+*.pem
+*.key
+*.crt
+*.p12
+*.jks
+*.keystore
+
+# Temporary files
+*.tmp
+*.temp
+
+# Logs
+logs/
+
+# Node modules (if any frontend is added)
+node_modules/
