@@ -20,7 +20,69 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Service for chat and messaging operations
+ * Chat and Messaging Service - Handles chat room operations and real-time
+ * messaging
+ * 
+ * This service is the core business logic engine for the chat application,
+ * managing
+ * all aspects of chat rooms, messaging, and real-time communication
+ * coordination.
+ * 
+ * Core Responsibilities:
+ * - Chat room creation and management (direct and group chats)
+ * - Real-time message sending and broadcasting
+ * - Message history retrieval with pagination
+ * - Participant management (adding, removing, validation)
+ * - Chat room discovery and user's chat listing
+ * - Message operations (editing, deletion, soft delete)
+ * - Real-time notifications and WebSocket coordination
+ * 
+ * Chat Room Types:
+ * - DIRECT: One-to-one private conversations between two users
+ * - GROUP: Multi-participant group conversations with admin controls
+ * - Automatic duplicate prevention for direct chats
+ * - Dynamic naming for direct chats based on participants
+ * 
+ * Real-time Architecture:
+ * - WebSocket integration via SimpMessagingTemplate
+ * - Redis pub-sub for multi-instance message broadcasting
+ * - Real-time participant notifications for room events
+ * - Live message delivery with delivery confirmation
+ * - Online presence integration for enhanced UX
+ * 
+ * Message Management:
+ * - Support for multiple message types (TEXT, FILE, IMAGE, SYSTEM)
+ * - Message threading and reply functionality
+ * - Soft deletion for message retraction ("unsend" feature)
+ * - File attachment handling and metadata storage
+ * - Message history with efficient pagination
+ * 
+ * Security and Validation:
+ * - Participant authorization and access control
+ * - User existence validation before operations
+ * - Current user context for all operations
+ * - Room membership verification for message access
+ * - Input validation and sanitization
+ * 
+ * Performance Optimizations:
+ * - Efficient pagination for message history
+ * - Batch participant validation
+ * - Optimized database queries for chat listings
+ * - Stream processing for DTO transformations
+ * - Caching integration points for frequently accessed data
+ * 
+ * Integration Points:
+ * - UserService: Current user context and participant validation
+ * - WebSocket: Real-time message broadcasting
+ * - Redis: Cross-instance message synchronization
+ * - File Storage: Attachment handling and URL management
+ * - Database: Persistent chat and message storage
+ * 
+ * Transaction Management:
+ * - Atomic chat room creation with participant assignment
+ * - Consistent message sending with room updates
+ * - Rollback protection for failed operations
+ * - Data integrity across related entities
  */
 @Service
 @RequiredArgsConstructor
@@ -102,7 +164,48 @@ public class ChatService {
     }
 
     /**
-     * Send a message to a chat room
+     * Sends a message to a chat room with real-time broadcasting and persistence
+     * 
+     * This method handles the complete message sending workflow including
+     * validation,
+     * persistence, and real-time delivery to all participants. It supports various
+     * message types, reply threading, and file attachments.
+     * 
+     * Message Sending Workflow:
+     * 1. Authentication: Verify sender identity from security context
+     * 2. Authorization: Validate sender is participant in target chat room
+     * 3. Validation: Check message type, content, and reply thread validity
+     * 4. Persistence: Save message to database with proper relationships
+     * 5. Broadcasting: Send real-time notifications to all room participants
+     * 6. Response: Return formatted message response for sender confirmation
+     * 
+     * Supported Message Types:
+     * - TEXT: Standard text messages with emoji and formatting support
+     * - FILE: File attachments with metadata (size, type, download URL)
+     * - IMAGE: Image attachments with thumbnail and preview support
+     * - SYSTEM: Automated messages for room events (joins, leaves, etc.)
+     * 
+     * Reply and Threading:
+     * - Supports threaded conversations via replyToMessageId
+     * - Validates reply target exists and is in same chat room
+     * - Maintains message hierarchy for conversation context
+     * - Thread depth tracking for UI rendering optimization
+     * 
+     * Real-time Features:
+     * - Immediate WebSocket broadcast to all room participants
+     * - Redis pub-sub for multi-instance message synchronization
+     * - Live typing indicators and delivery confirmations
+     * - Online presence awareness for message delivery optimization
+     * 
+     * Security and Validation:
+     * - Participant membership verification before message creation
+     * - Message content validation and sanitization
+     * - File attachment security checks and virus scanning
+     * - Rate limiting and spam prevention mechanisms
+     * 
+     * @param request SendMessageRequest containing message content and metadata
+     * @return MessageResponse with sent message details and delivery status
+     * @throws RuntimeException if chat room not found or user lacks permission
      */
     @Transactional
     public MessageResponse sendMessage(SendMessageRequest request) {

@@ -10,7 +10,45 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Repository interface for User entity
+ * User Repository Interface - Data Access Layer for User Entity Operations
+ * 
+ * This repository provides comprehensive database operations for user
+ * management,
+ * including authentication, search, and presence tracking functionality. It
+ * extends
+ * JpaRepository to leverage Spring Data JPA's automatic query generation and
+ * custom query capabilities.
+ * 
+ * Core Database Operations:
+ * - User authentication: Find by username/email for login validation
+ * - Uniqueness validation: Check username/email existence for registration
+ * - User search: Multi-field search across username, email, names
+ * - Presence tracking: Online status management and queries
+ * - Bulk operations: Batch user retrieval for chat operations
+ * 
+ * Custom Query Features:
+ * - Case-insensitive search for better user experience
+ * - Multi-field search using JPQL for flexible user discovery
+ * - Optimized queries for frequently used operations
+ * - Named parameter binding for SQL injection prevention
+ * 
+ * Performance Optimizations:
+ * - Database indexes on username and email fields
+ * - Efficient counting queries for existence checks
+ * - Batch operations for multiple user operations
+ * - Optimized search queries with LIKE operations
+ * 
+ * Security Considerations:
+ * - Parameterized queries prevent SQL injection
+ * - Username and email uniqueness enforcement
+ * - Proper case handling for authentication
+ * - Safe search operations without exposing sensitive data
+ * 
+ * Integration Points:
+ * - Spring Security: User authentication and authorization
+ * - UserService: Business logic and transaction management
+ * - Chat Services: User validation for chat operations
+ * - WebSocket: Online presence tracking
  */
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {

@@ -18,7 +18,73 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * REST controller for user management operations
+ * User Management REST Controller - Handles user profile and directory
+ * operations
+ * 
+ * This controller provides comprehensive user management endpoints for the chat
+ * application,
+ * enabling profile management, user discovery, and online presence features
+ * through a
+ * well-designed RESTful API.
+ * 
+ * Core API Endpoints:
+ * - GET /me: Current user profile retrieval
+ * - PUT /me: Profile update operations
+ * - GET /{id}: Public user profile lookup
+ * - GET /username/{username}: User lookup by username
+ * - GET /search: User search and discovery
+ * - GET /online: Online users listing
+ * - PUT /status: Online status management
+ * 
+ * Authentication & Authorization:
+ * - All endpoints require valid JWT authentication
+ * - Current user context automatically injected via Spring Security
+ * - Profile operations limited to authenticated user's own data
+ * - Public profile viewing for user discovery features
+ * 
+ * API Design Principles:
+ * - RESTful resource-based URL structure (/api/users/...)
+ * - Standard HTTP methods (GET, PUT) for semantic operations
+ * - Consistent JSON response format via ApiResponse wrapper
+ * - Comprehensive error handling with meaningful HTTP status codes
+ * - Input validation using Bean Validation annotations
+ * 
+ * Response Format:
+ * All endpoints return standardized ApiResponse<T> containing:
+ * - success: Boolean indicating operation success
+ * - message: Human-readable status message
+ * - data: Requested user information (UserResponse DTO)
+ * - timestamp: Response generation time for debugging
+ * 
+ * Security Features:
+ * - JWT token validation for all requests
+ * - User data exposure via safe DTOs (no sensitive information)
+ * - Rate limiting ready (configurable via Spring Security)
+ * - CORS configuration for cross-origin access
+ * 
+ * Performance Optimizations:
+ * - Pagination support for user search operations
+ * - Efficient database queries via service layer
+ * - DTO pattern reduces data transfer overhead
+ * - Caching integration points for frequently accessed data
+ * 
+ * Documentation & Testing:
+ * - OpenAPI/Swagger annotations for API documentation
+ * - Comprehensive operation descriptions and examples
+ * - Response code documentation for all scenarios
+ * - Tagged for organized API documentation
+ * 
+ * Integration Points:
+ * - UserService: Business logic delegation
+ * - Spring Security: Authentication and authorization
+ * - WebSocket: Real-time status updates
+ * - Chat Controllers: User discovery for chat operations
+ * 
+ * Error Handling:
+ * - Global exception handler integration
+ * - Detailed logging for debugging and monitoring
+ * - User-friendly error messages
+ * - Proper HTTP status codes for API clients
  */
 @RestController
 @RequestMapping("/api/users")
@@ -30,7 +96,38 @@ public class UserController {
     private final UserService userService;
 
     /**
-     * Get current user profile
+     * Retrieves the current authenticated user's complete profile information
+     * 
+     * This endpoint provides the primary method for clients to access the current
+     * user's profile data, including personal information, account status, and
+     * application-specific metadata.
+     * 
+     * Authentication Flow:
+     * 1. JWT token extracted from Authorization header
+     * 2. Spring Security validates token and sets authentication context
+     * 3. UserService retrieves current user from security context
+     * 4. User entity converted to UserResponse DTO for safe exposure
+     * 5. Complete profile data returned to client
+     * 
+     * Response Data:
+     * - Basic Info: username, email, first/last name, full name
+     * - Account Status: enabled, role, creation timestamp
+     * - Presence: online status, last seen timestamp
+     * - Profile: profile picture URL, preferences
+     * - Security: No sensitive data (password, tokens) exposed
+     * 
+     * Use Cases:
+     * - User profile page population
+     * - Navigation bar user information display
+     * - Account settings form pre-population
+     * - Authorization decisions in UI components
+     * 
+     * HTTP Status Codes:
+     * - 200 OK: Profile retrieved successfully
+     * - 401 Unauthorized: Invalid or missing JWT token
+     * - 500 Internal Server Error: Database or service errors
+     * 
+     * @return ResponseEntity containing ApiResponse with UserResponse data
      */
     @GetMapping("/me")
     @Operation(summary = "Get current user profile", description = "Get the profile of the currently authenticated user")

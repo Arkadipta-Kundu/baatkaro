@@ -19,7 +19,81 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * REST controller for chat operations
+ * Chat Management REST Controller - Handles chat room operations and messaging
+ * 
+ * This controller provides the core chat functionality through RESTful
+ * endpoints,
+ * managing chat room lifecycle, message operations, and participant management
+ * for the real-time chat application.
+ * 
+ * Core API Endpoints:
+ * - POST /rooms: Create new chat rooms (direct or group)
+ * - GET /rooms: List user's chat rooms with pagination
+ * - GET /rooms/{id}: Get specific chat room details
+ * - POST /rooms/{id}/messages: Send messages to chat rooms
+ * - GET /rooms/{id}/messages: Retrieve message history with pagination
+ * - POST /rooms/{id}/join: Join existing chat rooms
+ * - DELETE /rooms/{id}/leave: Leave chat rooms
+ * - PUT /rooms/{id}/participants: Manage room participants (admin only)
+ * 
+ * Chat Room Types:
+ * - DIRECT: One-to-one private conversations (auto-generated names)
+ * - GROUP: Multi-participant chat rooms (custom names, descriptions)
+ * - Duplicate prevention for direct chats between same users
+ * - Participant validation and authorization checks
+ * 
+ * Real-time Integration:
+ * - REST endpoints for message persistence and retrieval
+ * - WebSocket integration for live message broadcasting
+ * - Message status tracking (sent, delivered, read)
+ * - Real-time participant management notifications
+ * 
+ * Message Operations:
+ * - Multi-type message support (TEXT, FILE, IMAGE, SYSTEM)
+ * - Reply threading for organized conversations
+ * - Message editing and deletion (soft delete)
+ * - File attachment handling with metadata
+ * - Pagination for efficient message history loading
+ * 
+ * Security and Authorization:
+ * - JWT authentication required for all endpoints
+ * - Participant-only access to chat rooms and messages
+ * - Room creator permissions for administrative operations
+ * - Input validation and sanitization
+ * - File upload security and virus scanning integration points
+ * 
+ * API Design Standards:
+ * - RESTful resource-based URL structure (/api/chat/...)
+ * - Standard HTTP methods for semantic operations
+ * - Consistent ApiResponse<T> wrapper for all responses
+ * - Comprehensive HTTP status codes for proper client handling
+ * - Bean Validation for request validation
+ * 
+ * Performance Features:
+ * - Pagination for large datasets (rooms, messages)
+ * - Efficient database queries via service layer
+ * - DTO pattern for optimized data transfer
+ * - Streaming support for large file transfers
+ * - Caching integration for frequently accessed chat data
+ * 
+ * Documentation and Testing:
+ * - OpenAPI/Swagger annotations for comprehensive API docs
+ * - Operation descriptions, examples, and response schemas
+ * - Error response documentation for debugging
+ * - API testing support with example requests
+ * 
+ * Integration Points:
+ * - ChatService: Business logic and transaction management
+ * - WebSocketChatController: Real-time message broadcasting
+ * - UserService: Participant validation and user management
+ * - File Storage Service: Attachment upload and retrieval
+ * - Redis Publisher: Cross-instance message synchronization
+ * 
+ * Error Handling:
+ * - Global exception handling with meaningful error messages
+ * - Request validation with field-specific error details
+ * - Logging for debugging and monitoring
+ * - Graceful degradation for service failures
  */
 @RestController
 @RequestMapping("/api/chat")
