@@ -46,21 +46,9 @@ A comprehensive real-time chat application API built with Spring Boot 3, featuri
 
 - Java 21 or higher
 - Maven 3.6+
-- PostgreSQL 15+
-- Redis 7.0+
+  cd chatapp
 
-## 🚀 Quick Start
-
-### 1. Clone the Repository
-
-```bash
-git clone https://github.com/yourusername/chatapp.git
-cd chatapp
-```
-
-### 2. Database Setup
-
-#### PostgreSQL
+````
 
 ```sql
 -- Create database
@@ -69,18 +57,16 @@ CREATE DATABASE chatapp;
 -- Create user (optional)
 CREATE USER chatapp_user WITH PASSWORD 'your_password';
 GRANT ALL PRIVILEGES ON DATABASE chatapp TO chatapp_user;
-```
+````
 
 #### Redis
 
 Make sure Redis is running on default port 6379:
 
-```bash
+````bash
 redis-server
-```
 
 ### 3. Configuration
-
 Update `src/main/resources/application.properties`:
 
 ```properties
@@ -97,7 +83,7 @@ spring.data.redis.port=6379
 app.jwt.secret=YourSuperSecretJWTKeyThatShouldBeAtLeast256BitsLongForHS256Algorithm
 app.jwt.expiration=86400000
 app.jwt.refresh-expiration=604800000
-```
+````
 
 ### 4. Build and Run
 
@@ -129,67 +115,25 @@ Once the application is running, access the interactive API documentation:
 
 ### User Management
 
-- `GET /api/users/profile` - Get current user profile
-- `PUT /api/users/profile` - Update user profile
 - `GET /api/users/search` - Search users
 - `PUT /api/users/online-status` - Update online status
 
 ### Chat Management
 
-- `POST /api/chat/rooms` - Create chat room
-- `GET /api/chat/rooms` - Get user's chat rooms
-- `GET /api/chat/rooms/{roomId}/messages` - Get chat messages
-- `POST /api/chat/rooms/{roomId}/messages` - Send message
 - `POST /api/chat/rooms/{roomId}/join` - Join chat room
 - `DELETE /api/chat/rooms/{roomId}/leave` - Leave chat room
 
-### WebSocket Endpoints
-
-- `/ws` - WebSocket connection endpoint
-- `/app/chat.sendMessage` - Send message via WebSocket
 - `/app/chat.addUser` - Add user to chat
 - `/topic/public` - Public message topic
 - `/topic/chatroom/{roomId}` - Room-specific messages
+  mvn test
 
-## 🧪 Testing
+````
 
-### Run Tests
-
-```bash
-mvn test
-```
-
-### Test with Postman
-
-Import the API collection and test the endpoints:
-
-1. Register a new user
 2. Login to get JWT token
 3. Create a chat room
 4. Send messages
 5. Test WebSocket connection
-
-## 🐳 Docker Support
-
-### Using Docker Compose
-
-```bash
-# Start all services (PostgreSQL + Redis + Application)
-docker-compose up -d
-
-# Stop all services
-docker-compose down
-```
-
-### Manual Docker Build
-
-```bash
-# Build the image
-docker build -t chatapp:latest .
-
-# Run the container
-docker run -p 8080:8080 chatapp:latest
-```
 
 ## 🏗️ Architecture
 
@@ -233,9 +177,6 @@ export DB_HOST=localhost
 export DB_PORT=5432
 export DB_NAME=chatapp
 export DB_USERNAME=your_username
-export DB_PASSWORD=your_password
-export REDIS_HOST=localhost
-export REDIS_PORT=6379
 export JWT_SECRET=your_secret_key
 ```
 
@@ -248,12 +189,6 @@ export JWT_SECRET=your_secret_key
 ## 🚀 Deployment
 
 ### Production Deployment
-
-1. Build the JAR file: `mvn clean package`
-2. Set production environment variables
-3. Run: `java -jar target/chatapp-*.jar`
-
-### Cloud Deployment
 
 The application is ready for deployment on:
 
@@ -275,16 +210,8 @@ The application is ready for deployment on:
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🐛 Issues
-
-Found a bug or have a feature request? Please open an issue on GitHub.
-
 ## 📞 Support
 
-For support and questions:
-
-- Open an issue on GitHub
-- Check the API documentation
 - Review the code examples
 
 ## 🙏 Acknowledgments
@@ -297,4 +224,6 @@ For support and questions:
 ---
 
 **Built with ❤️ using Spring Boot 3 and Java 21**
+
 # baatkaro
+````

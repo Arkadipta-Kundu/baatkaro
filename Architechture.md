@@ -16,14 +16,6 @@ This comprehensive guide helps new developers understand the codebase structure,
 - **Documentation**: Swagger/OpenAPI 3
 - **Build**: Maven
 
-### High-Level Architecture
-
-```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Frontend      │    │   Load Balancer │    │   API Gateway   │
-│   (React/Vue)   │◄──►│   (Nginx)       │◄──►│   (Optional)    │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-                                                        │
                        ┌─────────────────────────────────┼─────────────────┐
                        │                                 ▼                 │
                        │            Spring Boot Application                 │
@@ -31,26 +23,17 @@ This comprehensive guide helps new developers understand the codebase structure,
                        │  │              Controllers                     │  │
                        │  │  ┌─────────┐ ┌─────────┐ ┌─────────────┐   │  │
                        │  │  │  Auth   │ │  Chat   │ │  WebSocket  │   │  │
-                       │  │  └─────────┘ └─────────┘ └─────────────┘   │  │
-                       │  └─────────────────────────────────────────────┘  │
-                       │  ┌─────────────────────────────────────────────┐  │
                        │  │                Services                     │  │
                        │  │  ┌─────────┐ ┌─────────┐ ┌─────────────┐   │  │
                        │  │  │ AuthSvc │ │ ChatSvc │ │  UserSvc    │   │  │
-                       │  │  └─────────┘ └─────────┘ └─────────────┘   │  │
-                       │  └─────────────────────────────────────────────┘  │
-                       │  ┌─────────────────────────────────────────────┐  │
                        │  │             Repositories                    │  │
                        │  │  ┌─────────┐ ┌─────────┐ ┌─────────────┐   │  │
                        │  │  │UserRepo │ │MsgRepo  │ │ ChatRepo    │   │  │
-                       │  │  └─────────┘ └─────────┘ └─────────────┘   │  │
-                       │  └─────────────────────────────────────────────┘  │
-                       └─────────────────────────────────────────────────────┘
-                                                        │
                        ┌─────────────────┐             │            ┌─────────────────┐
                        │   PostgreSQL    │◄────────────┼───────────►│     Redis       │
                        │   (Primary DB)  │             │            │  (Cache/PubSub) │
                        └─────────────────┘             │            └─────────────────┘
+
 ```
 
 ## 📁 Project Structure Deep Dive
@@ -58,45 +41,36 @@ This comprehensive guide helps new developers understand the codebase structure,
 ### Source Code Organization
 
 ```
+
 src/main/java/org/arkadipta/chatapp/
-├── config/                 # Configuration classes
-│   ├── SecurityConfig.java      # Spring Security + JWT setup
-│   ├── WebSocketConfig.java     # WebSocket configuration
-│   ├── RedisConfig.java         # Redis pub-sub configuration
-│   └── SwaggerConfig.java       # API documentation setup
-├── controller/             # REST and WebSocket controllers
-│   ├── AuthController.java      # Authentication endpoints
-│   ├── UserController.java      # User management endpoints
-│   ├── ChatController.java      # Chat room endpoints
-│   └── WebSocketChatController.java # Real-time messaging
-├── dto/                    # Data Transfer Objects
-│   ├── auth/                    # Authentication DTOs
-│   ├── user/                    # User management DTOs
-│   ├── chat/                    # Chat operation DTOs
-│   └── ApiResponse.java         # Standard API response wrapper
-├── exception/              # Exception handling
-│   ├── GlobalExceptionHandler.java # Global error handling
-│   ├── UserNotFoundException.java  # Custom exceptions
-│   └── ChatRoomNotFoundException.java
-├── model/                  # JPA Entity classes
-│   ├── User.java               # User entity + Spring Security integration
-│   ├── Message.java            # Message entity with file support
-│   ├── ChatRoom.java           # Chat room entity
-│   ├── Role.java               # User role enumeration
-│   └── MessageType.java        # Message type enumeration
-├── repository/             # Data Access Layer
-│   ├── UserRepository.java     # User database operations
-│   ├── MessageRepository.java  # Message database operations
-│   └── ChatRoomRepository.java # Chat room database operations
-├── security/               # Security components
-│   ├── JwtUtils.java           # JWT token generation/validation
-│   ├── JwtAuthenticationFilter.java # JWT filter for requests
-│   └── JwtAuthenticationEntryPoint.java # Auth error handling
-└── service/                # Business Logic Layer
-    ├── AuthService.java        # Authentication business logic
-    ├── UserService.java        # User management business logic
-    ├── ChatService.java        # Chat operations business logic
-    └── RedisMessagePublisher.java # Redis pub-sub messaging
+├── config/ # Configuration classes
+│ ├── SecurityConfig.java # Spring Security + JWT setup
+│ ├── WebSocketConfig.java # WebSocket configuration
+│ ├── RedisConfig.java # Redis pub-sub configuration
+│ └── SwaggerConfig.java # API documentation setup
+├── controller/ # REST and WebSocket controllers
+│ ├── AuthController.java # Authentication endpoints
+│ └── ChatRoomNotFoundException.java
+├── model/ # JPA Entity classes
+│ ├── User.java # User entity + Spring Security integration
+│ ├── Message.java # Message entity with file support
+│ ├── ChatRoom.java # Chat room entity
+│ ├── Role.java # User role enumeration
+│ └── MessageType.java # Message type enumeration
+├── repository/ # Data Access Layer
+│ ├── UserRepository.java # User database operations
+│ ├── MessageRepository.java # Message database operations
+│ └── ChatRoomRepository.java # Chat room database operations
+├── security/ # Security components
+│ ├── JwtUtils.java # JWT token generation/validation
+│ ├── JwtAuthenticationFilter.java # JWT filter for requests
+│ └── JwtAuthenticationEntryPoint.java # Auth error handling
+└── service/ # Business Logic Layer
+├── AuthService.java # Authentication business logic
+├── UserService.java # User management business logic
+├── ChatService.java # Chat operations business logic
+└── RedisMessagePublisher.java # Redis pub-sub messaging
+
 ```
 
 ## 🔐 Security Architecture
@@ -104,6 +78,7 @@ src/main/java/org/arkadipta/chatapp/
 ### JWT Authentication Flow
 
 ```
+
 1. User Login Request
    POST /api/auth/login
    { "username": "user", "password": "pass" }
@@ -128,6 +103,7 @@ src/main/java/org/arkadipta/chatapp/
 
 8. Controller Access
    @PreAuthorize("hasRole('USER')") or SecurityContext.getAuthentication()
+
 ```
 
 ### Security Configuration Breakdown
@@ -146,7 +122,9 @@ src/main/java/org/arkadipta/chatapp/
 ### WebSocket + STOMP Protocol
 
 ```
+
 WebSocket Connection Flow:
+
 1. Client connects: new WebSocket('/ws')
 2. STOMP handshake with JWT token in headers
 3. Authentication in WebSocketConfig.configureClientInboundChannel()
@@ -157,25 +135,28 @@ WebSocket Connection Flow:
 8. Redis notifies all app instances: @RedisMessageListener
 9. All instances broadcast: simpMessagingTemplate.convertAndSend()
 10. All connected clients receive message
+
 ```
 
 ### Message Flow Architecture
 
 ```
-User A (Instance 1)     User B (Instance 2)     User C (Instance 1)
-       │                       │                       │
-       ▼                       ▼                       ▼
-   WebSocket                WebSocket              WebSocket
-   Connection              Connection             Connection
-       │                       │                       │
-       ▼                       ▼                       ▼
- Spring Boot              Spring Boot            Spring Boot
- Instance 1               Instance 2             Instance 1
-       │                       │                       │
-       └─────────┬─────────────┴──────────┬────────────┘
-                 ▼                        ▼
-             Redis Pub-Sub           PostgreSQL
-           (Real-time sync)        (Persistence)
+
+User A (Instance 1) User B (Instance 2) User C (Instance 1)
+│ │ │
+▼ ▼ ▼
+WebSocket WebSocket WebSocket
+Connection Connection Connection
+│ │ │
+▼ ▼ ▼
+Spring Boot Spring Boot Spring Boot
+Instance 1 Instance 2 Instance 1
+│ │ │
+└─────────┬─────────────┴──────────┬────────────┘
+▼ ▼
+Redis Pub-Sub PostgreSQL
+(Real-time sync) (Persistence)
+
 ```
 
 ## 🗄️ Database Design
@@ -183,15 +164,17 @@ User A (Instance 1)     User B (Instance 2)     User C (Instance 1)
 ### Entity Relationships
 
 ```
+
 User (1) ────────── (N) Message
-  │                     │
-  │                     │
-  │ (N)             (1) │
-  │                     │
-  └── ChatRoom ─────────┘
-      (M:N via          (1:N)
-    participants)
-```
+│ │
+│ │
+│ (N) (1) │
+│ │
+└── ChatRoom ─────────┘
+(M:N via (1:N)
+participants)
+
+````
 
 ### Key Database Tables
 
@@ -229,7 +212,7 @@ public AuthResponse register(RegisterRequest request) {
     // 5. Generate JWT tokens
     // If any step fails, entire operation rolls back
 }
-```
+````
 
 ### Business Logic Organization
 
@@ -340,20 +323,6 @@ class AuthControllerTest {
 ```
 
 ## 🚀 Deployment Considerations
-
-### Docker Deployment
-
-The application includes complete Docker support:
-
-```yaml
-# docker-compose.yml provides:
-services:
-  app: # Spring Boot application
-  postgres: # PostgreSQL database
-  redis: # Redis cache/pub-sub
-  pgadmin: # Database management (optional)
-  redis-commander: # Redis management (optional)
-```
 
 ### Production Checklist
 
