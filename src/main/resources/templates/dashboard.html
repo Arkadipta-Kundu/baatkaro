@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title th:text="${pageTitle}">BaatKaro Dashboard</title>
+    <link rel="stylesheet" th:href="@{/css/common.css}" />
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}" />
+  </head>
+  <body>
+    <div class="dashboard-container">
+      <!-- Header -->
+      <header class="dashboard-header">
+        <div class="header-content">
+          <h1>🗣️ BaatKaro Dashboard</h1>
+          <div class="user-info">
+            <span id="currentUsername" class="username"></span>
+            <button id="logoutBtn" class="btn btn-secondary">Logout</button>
+          </div>
+        </div>
+      </header>
+
+      <!-- Main Content -->
+      <main class="dashboard-main">
+        <!-- Users Section -->
+        <section class="dashboard-section">
+          <div class="section-header">
+            <h2>👥 Users</h2>
+            <button id="refreshUsersBtn" class="btn btn-small">
+              🔄 Refresh
+            </button>
+          </div>
+
+          <div class="users-container">
+            <div id="usersLoading" class="loading">Loading users...</div>
+            <div
+              id="usersError"
+              class="error-message"
+              style="display: none"
+            ></div>
+            <table id="usersTable" class="data-table" style="display: none">
+              <thead>
+                <tr>
+                  <th>Username</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="usersTableBody">
+                <!-- Users will be populated here -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Rooms Section -->
+        <section class="dashboard-section">
+          <div class="section-header">
+            <h2>🏠 Rooms</h2>
+            <div>
+              <button id="createRoomBtn" class="btn btn-primary">
+                ➕ Create Room
+              </button>
+              <button id="joinRoomBtn" class="btn btn-secondary">
+                🔑 Join by ID
+              </button>
+              <button id="refreshRoomsBtn" class="btn btn-small">
+                🔄 Refresh
+              </button>
+            </div>
+          </div>
+
+          <div class="rooms-container">
+            <div id="roomsLoading" class="loading">Loading rooms...</div>
+            <div
+              id="roomsError"
+              class="error-message"
+              style="display: none"
+            ></div>
+            <table id="roomsTable" class="data-table" style="display: none">
+              <thead>
+                <tr>
+                  <th>Room Name</th>
+                  <th>Type</th>
+                  <th>Participants</th>
+                  <th>Creator</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="roomsTableBody">
+                <!-- Rooms will be populated here -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- Create Room Modal -->
+    <div id="createRoomModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Create New Room</h3>
+          <span class="close">&times;</span>
+        </div>
+        <form id="createRoomForm">
+          <div class="form-group">
+            <label for="roomName">Room Name</label>
+            <input
+              type="text"
+              id="roomName"
+              required
+              placeholder="Enter room name"
+            />
+          </div>
+          <div class="form-group">
+            <label>
+              <input type="checkbox" id="roomIsPrivate" />
+              Private Room (invite only)
+            </label>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary cancel-btn">
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-primary">Create</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Join Room Modal -->
+    <div id="joinRoomModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Join Room by ID</h3>
+          <span class="close">&times;</span>
+        </div>
+        <form id="joinRoomForm">
+          <div class="form-group">
+            <label for="roomId">Room ID</label>
+            <input
+              type="text"
+              id="roomId"
+              required
+              placeholder="Enter room ID (UUID)"
+            />
+            <small class="form-help"
+              >Get the room ID from the room creator</small
+            >
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary cancel-btn">
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-primary">Join</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script th:src="@{/js/dashboard.js}"></script>
+  </body>
+</html>

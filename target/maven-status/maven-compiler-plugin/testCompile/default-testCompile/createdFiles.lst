@@ -1,1 +1,4 @@
-org\arkadipta\chatapp\ChatappApplicationTests.class
+org\arkadipta\baatkaro\DatabaseConnectionTest.class
+org\arkadipta\baatkaro\RoomAndMessageTest.class
+org\arkadipta\baatkaro\BaatkaroApplicationTests.class
+org\arkadipta\baatkaro\Phase4Part4WebSocketTest.class
