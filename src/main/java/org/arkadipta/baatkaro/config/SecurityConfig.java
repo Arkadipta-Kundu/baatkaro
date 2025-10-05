@@ -11,6 +11,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfigurationSource;
 
 @Configuration
@@ -19,6 +20,9 @@ public class SecurityConfig {
 
     @Autowired
     private CorsConfigurationSource corsConfigurationSource;
+
+    @Autowired
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -37,7 +41,7 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource)) // Enable CORS
                 .csrf(csrf -> csrf.disable()) // Disable CSRF for REST API
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)) // Allow sessions for WebSocket
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Stateless for JWT
                 .authorizeHttpRequests(authz -> authz
                         // Public endpoints
                         .requestMatchers("/api/", "/api/info").permitAll()
@@ -49,21 +53,8 @@ public class SecurityConfig {
                         // Protected API endpoints
                         .requestMatchers("/api/**").authenticated()
                         .anyRequest().authenticated())
-                .httpBasic(basic -> basic
-                        .realmName("BaatKaro Chat API")
-                        .authenticationEntryPoint((request, response, authException) -> {
-                            response.setStatus(401);
-                            response.setContentType("application/json");
-                            response.getWriter().write("""
-                                    {
-                                        "timestamp": "%s",
-                                        "status": 401,
-                                        "error": "Unauthorized",
-                                        "message": "Authentication required",
-                                        "path": "%s"
-                                    }
-                                    """.formatted(java.time.LocalDateTime.now(), request.getRequestURI()));
-                        }));
+                // Add JWT filter before UsernamePasswordAuthenticationFilter
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

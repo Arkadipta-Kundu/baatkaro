@@ -15,15 +15,11 @@ public class UserResponse {
 
     private UUID id;
     private String username;
-    private Boolean online;
-    private LocalDateTime lastSeen;
     private LocalDateTime createdAt;
 
     public UserResponse(User user) {
         this.id = user.getId();
         this.username = user.getUsername();
-        this.online = user.getOnline();
-        this.lastSeen = user.getLastSeen();
         this.createdAt = user.getCreatedAt();
     }
 
@@ -37,8 +33,6 @@ public class UserResponse {
         return "UserResponse{" +
                 "id=" + id +
                 ", username='" + username + '\'' +
-                ", online=" + online +
-                ", lastSeen=" + lastSeen +
                 '}';
     }
 }

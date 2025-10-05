@@ -1,5 +1,9 @@
 E:\work\AllProjects\baatkaro\src\main\java\org\arkadipta\baatkaro\BaatkaroApplication.java
 E:\work\AllProjects\baatkaro\src\main\java\org\arkadipta\baatkaro\config\CorsConfig.java
+E:\work\AllProjects\baatkaro\src\main\java\org\arkadipta\baatkaro\config\EnhancedHandshakeInterceptor.java
+E:\work\AllProjects\baatkaro\src\main\java\org\arkadipta\baatkaro\config\JwtAuthenticationFilter.java
+E:\work\AllProjects\baatkaro\src\main\java\org\arkadipta\baatkaro\config\JwtUtil.java
+E:\work\AllProjects\baatkaro\src\main\java\org\arkadipta\baatkaro\config\RedisConfig.java
 E:\work\AllProjects\baatkaro\src\main\java\org\arkadipta\baatkaro\config\SecurityConfig.java
 E:\work\AllProjects\baatkaro\src\main\java\org\arkadipta\baatkaro\config\StompPrincipal.java
 E:\work\AllProjects\baatkaro\src\main\java\org\arkadipta\baatkaro\config\UsernameHandshakeInterceptor.java
@@ -9,6 +13,7 @@ E:\work\AllProjects\baatkaro\src\main\java\org\arkadipta\baatkaro\controller\Aut
 E:\work\AllProjects\baatkaro\src\main\java\org\arkadipta\baatkaro\controller\ChatController.java
 E:\work\AllProjects\baatkaro\src\main\java\org\arkadipta\baatkaro\controller\MessageController.java
 E:\work\AllProjects\baatkaro\src\main\java\org\arkadipta\baatkaro\controller\PageController.java
+E:\work\AllProjects\baatkaro\src\main\java\org\arkadipta\baatkaro\controller\RedisTestController.java
 E:\work\AllProjects\baatkaro\src\main\java\org\arkadipta\baatkaro\controller\RoomController.java
 E:\work\AllProjects\baatkaro\src\main\java\org\arkadipta\baatkaro\controller\UserController.java
 E:\work\AllProjects\baatkaro\src\main\java\org\arkadipta\baatkaro\controller\WebController.java
@@ -32,8 +37,9 @@ E:\work\AllProjects\baatkaro\src\main\java\org\arkadipta\baatkaro\repository\Mes
 E:\work\AllProjects\baatkaro\src\main\java\org\arkadipta\baatkaro\repository\RoomRepository.java
 E:\work\AllProjects\baatkaro\src\main\java\org\arkadipta\baatkaro\repository\UserRepository.java
 E:\work\AllProjects\baatkaro\src\main\java\org\arkadipta\baatkaro\service\CustomUserDetailsService.java
+E:\work\AllProjects\baatkaro\src\main\java\org\arkadipta\baatkaro\service\JwtService.java
+E:\work\AllProjects\baatkaro\src\main\java\org\arkadipta\baatkaro\service\MessageBroadcastService.java
 E:\work\AllProjects\baatkaro\src\main\java\org\arkadipta\baatkaro\service\MessageService.java
 E:\work\AllProjects\baatkaro\src\main\java\org\arkadipta\baatkaro\service\RoomService.java
 E:\work\AllProjects\baatkaro\src\main\java\org\arkadipta\baatkaro\service\UserService.java
-E:\work\AllProjects\baatkaro\src\main\java\org\arkadipta\baatkaro\service\UserSessionManager.java
 E:\work\AllProjects\baatkaro\src\main\java\org\arkadipta\baatkaro\service\WebSocketEventListener.java

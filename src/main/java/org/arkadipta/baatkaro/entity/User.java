@@ -35,13 +35,6 @@ public class User {
     @Size(min = 6, message = "Password must be at least 6 characters")
     private String password;
 
-    @Column(nullable = false)
-    @Builder.Default
-    private Boolean online = false;
-
-    @Column(name = "last_seen")
-    private LocalDateTime lastSeen;
-
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -59,19 +52,7 @@ public class User {
     public User(String username, String password) {
         this.username = username;
         this.password = password;
-        this.online = false;
         this.rooms = new HashSet<>();
-    }
-
-    // Utility methods
-    public void goOnline() {
-        this.online = true;
-        this.lastSeen = null; // Clear last seen when online
-    }
-
-    public void goOffline() {
-        this.online = false;
-        this.lastSeen = LocalDateTime.now();
     }
 
     // Override toString to include useful info without sensitive data
@@ -79,8 +60,6 @@ public class User {
         return "User{" +
                 "id=" + id +
                 ", username='" + username + '\'' +
-                ", online=" + online +
-                ", lastSeen=" + lastSeen +
                 '}';
     }
 }

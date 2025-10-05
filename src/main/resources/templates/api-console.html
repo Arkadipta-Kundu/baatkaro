@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BaatKaro API Testing Console</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link href="/css/api-console.css" rel="stylesheet" />
+  </head>
+  <body>
+    <div id="app" class="container-fluid">
+      <!-- Header -->
+      <nav class="navbar navbar-dark bg-dark mb-4">
+        <div class="container-fluid">
+          <span class="navbar-brand">
+            <i class="fas fa-code"></i> BaatKaro API Testing Console
+          </span>
+          <div class="d-flex align-items-center">
+            <span id="connection-status" class="badge bg-danger me-3">
+              <i class="fas fa-circle"></i> Disconnected
+            </span>
+            <span id="redis-status" class="badge bg-secondary me-3">
+              <i class="fas fa-database"></i> Redis: Unknown
+            </span>
+            <button
+              id="logout-btn"
+              class="btn btn-outline-light btn-sm"
+              style="display: none"
+            >
+              <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+          </div>
+        </div>
+      </nav>
+
+      <!-- Login Section -->
+      <div id="login-section" class="row justify-content-center">
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-header">
+              <h5>
+                <i class="fas fa-sign-in-alt"></i> Authentication Required
+              </h5>
+            </div>
+            <div class="card-body">
+              <form id="login-form">
+                <div class="mb-3">
+                  <label for="username" class="form-label">Username</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="username"
+                    required
+                  />
+                </div>
+                <div class="mb-3">
+                  <label for="password" class="form-label">Password</label>
+                  <input
+                    type="password"
+                    class="form-control"
+                    id="password"
+                    required
+                  />
+                </div>
+                <button type="submit" class="btn btn-primary">
+                  <i class="fas fa-sign-in-alt"></i> Login
+                </button>
+              </form>
+              <div id="login-response" class="mt-3"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Console -->
+      <div id="main-console" style="display: none">
+        <div class="row">
+          <!-- Left Sidebar - API Endpoints -->
+          <div class="col-md-4">
+            <div class="card">
+              <div class="card-header">
+                <h5><i class="fas fa-list"></i> API Endpoints</h5>
+              </div>
+              <div class="card-body p-0">
+                <div class="list-group list-group-flush">
+                  <!-- Authentication APIs -->
+                  <div class="list-group-item">
+                    <h6 class="mb-1 text-primary">Authentication APIs</h6>
+                  </div>
+                  <a
+                    href="#"
+                    class="list-group-item list-group-item-action api-endpoint"
+                    data-endpoint="register"
+                  >
+                    <span class="badge bg-success me-2">POST</span> Register
+                    User
+                  </a>
+                  <a
+                    href="#"
+                    class="list-group-item list-group-item-action api-endpoint"
+                    data-endpoint="check-username"
+                  >
+                    <span class="badge bg-info me-2">GET</span> Check Username
+                  </a>
+                  <a
+                    href="#"
+                    class="list-group-item list-group-item-action api-endpoint"
+                    data-endpoint="logout"
+                  >
+                    <span class="badge bg-warning me-2">POST</span> Logout
+                  </a>
+
+                  <!-- User APIs -->
+                  <div class="list-group-item">
+                    <h6 class="mb-1 text-primary">User APIs</h6>
+                  </div>
+                  <a
+                    href="#"
+                    class="list-group-item list-group-item-action api-endpoint"
+                    data-endpoint="users-all"
+                  >
+                    <span class="badge bg-info me-2">GET</span> Get All Users
+                  </a>
+                  <a
+                    href="#"
+                    class="list-group-item list-group-item-action api-endpoint"
+                    data-endpoint="users-search"
+                  >
+                    <span class="badge bg-info me-2">GET</span> Search Users
+                  </a>
+                  <a
+                    href="#"
+                    class="list-group-item list-group-item-action api-endpoint"
+                    data-endpoint="users-profile"
+                  >
+                    <span class="badge bg-info me-2">GET</span> Get User Profile
+                  </a>
+
+                  <!-- Room APIs -->
+                  <div class="list-group-item">
+                    <h6 class="mb-1 text-primary">Room APIs</h6>
+                  </div>
+                  <a
+                    href="#"
+                    class="list-group-item list-group-item-action api-endpoint"
+                    data-endpoint="rooms-create"
+                  >
+                    <span class="badge bg-success me-2">POST</span> Create Room
+                  </a>
+                  <a
+                    href="#"
+                    class="list-group-item list-group-item-action api-endpoint"
+                    data-endpoint="rooms-all"
+                  >
+                    <span class="badge bg-info me-2">GET</span> Get All Rooms
+                  </a>
+                  <a
+                    href="#"
+                    class="list-group-item list-group-item-action api-endpoint"
+                    data-endpoint="rooms-join"
+                  >
+                    <span class="badge bg-success me-2">POST</span> Join Room
+                  </a>
+                  <a
+                    href="#"
+                    class="list-group-item list-group-item-action api-endpoint"
+                    data-endpoint="rooms-leave"
+                  >
+                    <span class="badge bg-warning me-2">POST</span> Leave Room
+                  </a>
+
+                  <!-- Message APIs -->
+                  <div class="list-group-item">
+                    <h6 class="mb-1 text-primary">Message APIs</h6>
+                  </div>
+                  <a
+                    href="#"
+                    class="list-group-item list-group-item-action api-endpoint"
+                    data-endpoint="messages-private"
+                  >
+                    <span class="badge bg-success me-2">POST</span> Send Private
+                    Message
+                  </a>
+                  <a
+                    href="#"
+                    class="list-group-item list-group-item-action api-endpoint"
+                    data-endpoint="messages-history"
+                  >
+                    <span class="badge bg-info me-2">GET</span> Get Message
+                    History
+                  </a>
+
+                  <!-- Redis Testing APIs -->
+                  <div class="list-group-item">
+                    <h6 class="mb-1 text-warning">Redis Testing APIs</h6>
+                  </div>
+                  <a
+                    href="#"
+                    class="list-group-item list-group-item-action api-endpoint"
+                    data-endpoint="redis-status"
+                  >
+                    <span class="badge bg-info me-2">GET</span> Redis Status
+                  </a>
+                  <a
+                    href="#"
+                    class="list-group-item list-group-item-action api-endpoint"
+                    data-endpoint="redis-test-pubsub"
+                  >
+                    <span class="badge bg-success me-2">POST</span> Test Redis
+                    Pub/Sub
+                  </a>
+                  <a
+                    href="#"
+                    class="list-group-item list-group-item-action api-endpoint"
+                    data-endpoint="redis-simulate-multi"
+                  >
+                    <span class="badge bg-success me-2">POST</span> Simulate
+                    Multi-Instance
+                  </a>
+                  <a
+                    href="#"
+                    class="list-group-item list-group-item-action api-endpoint"
+                    data-endpoint="redis-metrics"
+                  >
+                    <span class="badge bg-info me-2">GET</span> Redis Metrics
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <!-- WebSocket Control Panel -->
+            <div class="card mt-3">
+              <div class="card-header">
+                <h5><i class="fas fa-plug"></i> WebSocket Control</h5>
+              </div>
+              <div class="card-body">
+                <button id="ws-connect" class="btn btn-success btn-sm me-2">
+                  <i class="fas fa-plug"></i> Connect
+                </button>
+                <button
+                  id="ws-disconnect"
+                  class="btn btn-danger btn-sm"
+                  disabled
+                >
+                  <i class="fas fa-unplug"></i> Disconnect
+                </button>
+                <div class="mt-3">
+                  <h6>Send WebSocket Message</h6>
+                  <div class="row">
+                    <div class="col-12 mb-2">
+                      <select
+                        id="ws-message-type"
+                        class="form-select form-select-sm"
+                      >
+                        <option value="room">Room Message</option>
+                        <option value="private">Private Message</option>
+                      </select>
+                    </div>
+                    <div class="col-12 mb-2">
+                      <input
+                        type="text"
+                        id="ws-target"
+                        class="form-control form-control-sm"
+                        placeholder="Room ID or Username"
+                      />
+                    </div>
+                    <div class="col-12 mb-2">
+                      <input
+                        type="text"
+                        id="ws-message-content"
+                        class="form-control form-control-sm"
+                        placeholder="Message content"
+                      />
+                    </div>
+                    <div class="col-12">
+                      <button
+                        id="ws-send"
+                        class="btn btn-primary btn-sm"
+                        disabled
+                      >
+                        <i class="fas fa-paper-plane"></i> Send
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Redis Scaling Test Panel -->
+            <div class="card mt-3">
+              <div class="card-header">
+                <h5>
+                  <i class="fas fa-database"></i> Redis Cross-Server Scaling
+                  Test
+                </h5>
+              </div>
+              <div class="card-body">
+                <div class="mb-3">
+                  <div
+                    class="d-flex justify-content-between align-items-center mb-2"
+                  >
+                    <span>Redis Status:</span>
+                    <span id="redis-test-status" class="badge bg-secondary"
+                      >Unknown</span
+                    >
+                  </div>
+                  <div
+                    class="d-flex justify-content-between align-items-center mb-2"
+                  >
+                    <span>Server Instance:</span>
+                    <span id="server-instance" class="badge bg-info"
+                      >Instance-1</span
+                    >
+                  </div>
+                </div>
+
+                <h6>Test Cross-Server Messaging</h6>
+                <div class="row">
+                  <div class="col-12 mb-2">
+                    <input
+                      type="text"
+                      id="redis-test-message"
+                      class="form-control form-control-sm"
+                      placeholder="Test message for Redis Pub/Sub"
+                    />
+                  </div>
+                  <div class="col-12 mb-2">
+                    <button
+                      id="test-redis-broadcast"
+                      class="btn btn-warning btn-sm me-2"
+                    >
+                      <i class="fas fa-broadcast-tower"></i> Test Redis
+                      Broadcast
+                    </button>
+                    <button
+                      id="simulate-server-instance"
+                      class="btn btn-info btn-sm"
+                    >
+                      <i class="fas fa-server"></i> Simulate Multi-Instance
+                    </button>
+                  </div>
+                </div>
+
+                <div class="mt-3">
+                  <h6>Redis Pub/Sub Monitor</h6>
+                  <div
+                    id="redis-monitor"
+                    style="
+                      height: 150px;
+                      overflow-y: auto;
+                      background: #f8f9fa;
+                      border: 1px solid #dee2e6;
+                      padding: 8px;
+                      font-size: 0.85em;
+                    "
+                  >
+                    <div class="text-muted text-center">
+                      <i class="fas fa-satellite-dish"></i> Redis Pub/Sub
+                      activity will appear here
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Sample Data Guide -->
+            <div class="card mt-3">
+              <div class="card-header">
+                <h5><i class="fas fa-info-circle"></i> Sample Test Data</h5>
+              </div>
+              <div class="card-body">
+                <div class="accordion" id="sampleDataAccordion">
+                  <div class="accordion-item">
+                    <h2 class="accordion-header">
+                      <button
+                        class="accordion-button collapsed"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#userSamples"
+                        aria-expanded="false"
+                      >
+                        <i class="fas fa-user"></i>&nbsp; User Examples
+                      </button>
+                    </h2>
+                    <div
+                      id="userSamples"
+                      class="accordion-collapse collapse"
+                      data-bs-parent="#sampleDataAccordion"
+                    >
+                      <div class="accordion-body">
+                        <small class="text-muted">
+                          <strong>Register User:</strong><br />
+                          Username: testuser1<br />
+                          Email: test1@example.com<br />
+                          Password: password123<br />
+                          Full Name: Test User One<br /><br />
+
+                          <strong>Login:</strong><br />
+                          Username: testuser1<br />
+                          Password: password123
+                        </small>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="accordion-item">
+                    <h2 class="accordion-header">
+                      <button
+                        class="accordion-button collapsed"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#roomSamples"
+                        aria-expanded="false"
+                      >
+                        <i class="fas fa-comments"></i>&nbsp; Room Examples
+                      </button>
+                    </h2>
+                    <div
+                      id="roomSamples"
+                      class="accordion-collapse collapse"
+                      data-bs-parent="#sampleDataAccordion"
+                    >
+                      <div class="accordion-body">
+                        <small class="text-muted">
+                          <strong>Create Room:</strong><br />
+                          Name: General Discussion<br />
+                          Description: Main chat room<br />
+                          Private: false<br /><br />
+
+                          <strong>WebSocket Room ID:</strong><br />
+                          Use room UUID from API response
+                        </small>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="accordion-item">
+                    <h2 class="accordion-header">
+                      <button
+                        class="accordion-button collapsed"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#redisHelp"
+                        aria-expanded="false"
+                      >
+                        <i class="fas fa-database"></i>&nbsp; Redis Testing
+                        Guide
+                      </button>
+                    </h2>
+                    <div
+                      id="redisHelp"
+                      class="accordion-collapse collapse"
+                      data-bs-parent="#sampleDataAccordion"
+                    >
+                      <div class="accordion-body">
+                        <small class="text-muted">
+                          <strong>Redis Cross-Server Test:</strong><br />
+                          1. Send a message via WebSocket<br />
+                          2. Check Redis Pub/Sub monitor for activity<br />
+                          3. Use "Test Redis Broadcast" to simulate cross-server
+                          messages<br />
+                          4. "Simulate Multi-Instance" shows how multiple server
+                          instances would communicate<br /><br />
+
+                          <strong>What to Look For:</strong><br />
+                          • Redis connection status<br />
+                          • Pub/Sub message routing<br />
+                          • Cross-instance message delivery simulation
+                        </small>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Center - API Form -->
+          <div class="col-md-4">
+            <div class="card">
+              <div class="card-header">
+                <h5><i class="fas fa-cogs"></i> API Request Builder</h5>
+              </div>
+              <div class="card-body">
+                <div id="api-form-container">
+                  <div class="text-muted text-center">
+                    <i class="fas fa-mouse-pointer fa-2x"></i>
+                    <p class="mt-2">
+                      Select an API endpoint from the left to start testing
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right - Response Viewer -->
+          <div class="col-md-4">
+            <div class="card">
+              <div
+                class="card-header d-flex justify-content-between align-items-center"
+              >
+                <h5><i class="fas fa-eye"></i> Response Viewer</h5>
+                <button
+                  id="clear-responses"
+                  class="btn btn-outline-secondary btn-sm"
+                >
+                  <i class="fas fa-trash"></i> Clear
+                </button>
+              </div>
+              <div class="card-body">
+                <div id="response-container">
+                  <div class="text-muted text-center">
+                    <i class="fas fa-inbox fa-2x"></i>
+                    <p class="mt-2">API responses will appear here</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- WebSocket Messages -->
+            <div class="card mt-3">
+              <div
+                class="card-header d-flex justify-content-between align-items-center"
+              >
+                <h5><i class="fas fa-comments"></i> WebSocket Messages</h5>
+                <button
+                  id="clear-ws-messages"
+                  class="btn btn-outline-secondary btn-sm"
+                >
+                  <i class="fas fa-trash"></i> Clear
+                </button>
+              </div>
+              <div class="card-body">
+                <div
+                  id="ws-messages-container"
+                  style="height: 300px; overflow-y: auto"
+                >
+                  <div class="text-muted text-center">
+                    <i class="fas fa-comments fa-2x"></i>
+                    <p class="mt-2">WebSocket messages will appear here</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@6/bundles/stomp.umd.min.js"></script>
+    <script src="/js/api-console.js"></script>
+  </body>
+</html>

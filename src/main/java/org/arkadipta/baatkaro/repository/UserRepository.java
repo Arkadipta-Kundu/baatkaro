@@ -18,11 +18,8 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     // Check if username exists
     boolean existsByUsername(String username);
 
-    // Find all online users
-    List<User> findByOnlineTrue();
-
-    // Find all offline users
-    List<User> findByOnlineFalse();
+    // Find users by list of usernames (for online status)
+    List<User> findByUsernameIn(List<String> usernames);
 
     // Custom query to find users with username containing search term
     @Query("SELECT u FROM User u WHERE u.username LIKE %:searchTerm%")

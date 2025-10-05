@@ -9,7 +9,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -24,6 +23,9 @@ public class UserService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private WebSocketEventListener webSocketEventListener;
 
     /**
      * Register a new user
@@ -43,7 +45,6 @@ public class UserService {
         User user = new User();
         user.setUsername(request.getUsername());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setOnline(false);
 
         // Save user
         User savedUser = userRepository.save(user);
@@ -66,10 +67,17 @@ public class UserService {
     }
 
     /**
-     * Get all online users
+     * Get online users from active WebSocket sessions
      */
     public List<UserResponse> getOnlineUsers() {
-        return userRepository.findByOnlineTrue()
+        // Get usernames from active WebSocket sessions
+        List<String> activeUsernames = webSocketEventListener.getActiveUsers().values()
+                .stream()
+                .distinct()
+                .toList();
+
+        // Get user details for active users
+        return userRepository.findByUsernameIn(activeUsernames)
                 .stream()
                 .map(UserResponse::fromUser)
                 .collect(Collectors.toList());
@@ -83,34 +91,6 @@ public class UserService {
                 .stream()
                 .map(UserResponse::fromUser)
                 .collect(Collectors.toList());
-    }
-
-    /**
-     * Set user online status
-     */
-    public void setUserOnline(String username, boolean online) {
-        Optional<User> userOpt = userRepository.findByUsername(username);
-        if (userOpt.isPresent()) {
-            User user = userOpt.get();
-            if (online) {
-                user.goOnline();
-            } else {
-                user.goOffline();
-            }
-            userRepository.save(user);
-        }
-    }
-
-    /**
-     * Update user's last seen timestamp
-     */
-    public void updateLastSeen(String username) {
-        Optional<User> userOpt = userRepository.findByUsername(username);
-        if (userOpt.isPresent()) {
-            User user = userOpt.get();
-            user.setLastSeen(LocalDateTime.now());
-            userRepository.save(user);
-        }
     }
 
     /**
@@ -141,11 +121,7 @@ public class UserService {
 
             // Check if the provided password matches the stored password
             if (passwordEncoder.matches(password, user.getPassword())) {
-                // Authentication successful - update last seen and online status
-                user.setLastSeen(LocalDateTime.now());
-                user.goOnline();
-                userRepository.save(user);
-
+                // Authentication successful
                 return UserResponse.fromUser(user);
             }
         }

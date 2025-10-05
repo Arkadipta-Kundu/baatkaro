@@ -7,9 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/users")
@@ -17,6 +15,15 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    /**
+     * Get all users (base endpoint)
+     */
+    @GetMapping
+    public ResponseEntity<List<UserResponse>> getUsers() {
+        List<UserResponse> allUsers = userService.getAllUsers();
+        return ResponseEntity.ok(allUsers);
+    }
 
     /**
      * Get all online users
@@ -60,30 +67,4 @@ public class UserController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    /**
-     * Update user online status
-     */
-    @PostMapping("/status")
-    public ResponseEntity<?> updateUserStatus(@RequestBody Map<String, Boolean> statusUpdate,
-            Authentication authentication) {
-        if (authentication == null || !authentication.isAuthenticated()) {
-            return ResponseEntity.status(401).build();
-        }
-
-        String username = authentication.getName();
-        Boolean online = statusUpdate.get("online");
-
-        if (online != null) {
-            userService.setUserOnline(username, online);
-
-            Map<String, Object> response = new HashMap<>();
-            response.put("message", "Status updated successfully");
-            response.put("username", username);
-            response.put("online", online);
-
-            return ResponseEntity.ok(response);
-        }
-
-        return ResponseEntity.badRequest().body("Invalid status update request");
-    }
 }

@@ -1,9 +1,10 @@
 org\arkadipta\baatkaro\dto\MessageResponse$MessageResponseBuilder.class
 org\arkadipta\baatkaro\dto\UserResponse.class
 org\arkadipta\baatkaro\config\UserPrincipalHandshakeHandler.class
+org\arkadipta\baatkaro\controller\RedisTestController.class
 org\arkadipta\baatkaro\dto\MessageStatus.class
-org\arkadipta\baatkaro\service\UserSessionManager.class
 org\arkadipta\baatkaro\dto\RoomResponse.class
+org\arkadipta\baatkaro\config\EnhancedHandshakeInterceptor.class
 org\arkadipta\baatkaro\entity\User$UserBuilder.class
 org\arkadipta\baatkaro\dto\UserLoginRequest.class
 org\arkadipta\baatkaro\entity\Message.class
@@ -16,6 +17,7 @@ org\arkadipta\baatkaro\entity\Room.class
 org\arkadipta\baatkaro\config\UsernameHandshakeInterceptor.class
 org\arkadipta\baatkaro\controller\MessageController.class
 org\arkadipta\baatkaro\dto\MessageResponse.class
+org\arkadipta\baatkaro\service\MessageBroadcastService.class
 org\arkadipta\baatkaro\controller\PageController.class
 org\arkadipta\baatkaro\entity\User.class
 org\arkadipta\baatkaro\repository\MessageRepository.class
@@ -23,9 +25,12 @@ org\arkadipta\baatkaro\service\MessageService.class
 org\arkadipta\baatkaro\config\CorsConfig.class
 org\arkadipta\baatkaro\dto\UserRegistrationRequest.class
 org\arkadipta\baatkaro\config\StompPrincipal.class
+org\arkadipta\baatkaro\config\RedisConfig.class
 org\arkadipta\baatkaro\service\WebSocketEventListener.class
+org\arkadipta\baatkaro\config\JwtAuthenticationFilter.class
 org\arkadipta\baatkaro\repository\RoomRepository.class
 org\arkadipta\baatkaro\BaatkaroApplication.class
+org\arkadipta\baatkaro\service\JwtService.class
 org\arkadipta\baatkaro\entity\Message$MessageBuilder.class
 org\arkadipta\baatkaro\controller\RoomController.class
 org\arkadipta\baatkaro\entity\Room$RoomBuilder.class

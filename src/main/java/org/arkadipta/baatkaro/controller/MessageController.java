@@ -1,12 +1,14 @@
 package org.arkadipta.baatkaro.controller;
 
 import org.arkadipta.baatkaro.dto.MessageHistoryResponse;
+import org.arkadipta.baatkaro.dto.MessageRequest;
 import org.arkadipta.baatkaro.service.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.validation.Valid;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +20,31 @@ public class MessageController {
 
     @Autowired
     private MessageService messageService;
+
+    /**
+     * Send a private message
+     */
+    @PostMapping("/private")
+    public ResponseEntity<?> sendPrivateMessage(@Valid @RequestBody MessageRequest request,
+            Authentication authentication) {
+        try {
+            String senderUsername = authentication.getName();
+
+            // Save the message using the message service
+            messageService.savePrivateMessage(senderUsername, request.getReceiver(), request.getContent());
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "Message sent successfully");
+
+            return ResponseEntity.ok(response);
+
+        } catch (IllegalArgumentException e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", e.getMessage());
+            return ResponseEntity.badRequest().body(error);
+        }
+    }
 
     /**
      * Get private message history between current user and another user

@@ -21,9 +21,6 @@ public class WebSocketEventListener {
     @Autowired
     private SimpMessageSendingOperations messagingTemplate;
 
-    @Autowired
-    private UserService userService;
-
     // Track active sessions
     private final Map<String, String> activeUsers = new ConcurrentHashMap<>();
 
@@ -47,7 +44,6 @@ public class WebSocketEventListener {
 
         if (username != null) {
             activeUsers.put(sessionId, username);
-            userService.setUserOnline(username, true);
 
             logger.info("User connected: {} (Session: {})", username, sessionId);
 
@@ -67,8 +63,6 @@ public class WebSocketEventListener {
         String username = activeUsers.remove(sessionId);
 
         if (username != null) {
-            userService.setUserOnline(username, false);
-
             logger.info("User disconnected: {} (Session: {})", username, sessionId);
 
             // Broadcast user offline status

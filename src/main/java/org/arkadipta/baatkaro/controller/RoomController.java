@@ -55,10 +55,20 @@ public class RoomController {
     }
 
     /**
-     * Get all rooms
+     * Get all public rooms (private rooms are not shown)
      */
     @GetMapping
-    public ResponseEntity<List<RoomResponse>> getAllRooms(Authentication authentication) {
+    public ResponseEntity<List<RoomResponse>> getAllRooms() {
+        // Only return public rooms for browsing
+        List<RoomResponse> publicRooms = roomService.getAllPublicRooms();
+        return ResponseEntity.ok(publicRooms);
+    }
+
+    /**
+     * Get all rooms for a user (public + user's private rooms)
+     */
+    @GetMapping("/for-user")
+    public ResponseEntity<List<RoomResponse>> getAllRoomsForUser(Authentication authentication) {
         List<RoomResponse> rooms = roomService.getAllRoomsForUser(authentication.getName());
         return ResponseEntity.ok(rooms);
     }
@@ -156,7 +166,35 @@ public class RoomController {
     }
 
     /**
-     * Search rooms by name
+     * Join a room by room ID (for private rooms or direct links)
+     */
+    @PostMapping("/join-by-id")
+    public ResponseEntity<?> joinRoomById(@RequestParam String roomId,
+            Authentication authentication) {
+        try {
+            String username = authentication.getName();
+            UUID parsedRoomId = UUID.fromString(roomId);
+            RoomResponse roomResponse = roomService.joinRoom(parsedRoomId, username);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Successfully joined room");
+            response.put("room", roomResponse);
+
+            return ResponseEntity.ok(response);
+
+        } catch (IllegalArgumentException e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", e.getMessage());
+            return ResponseEntity.badRequest().body(error);
+        } catch (Exception e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", "Invalid room ID format");
+            return ResponseEntity.badRequest().body(error);
+        }
+    }
+
+    /**
+     * Search rooms by name (only public rooms)
      */
     @GetMapping("/search")
     public ResponseEntity<List<RoomResponse>> searchRooms(@RequestParam String query) {

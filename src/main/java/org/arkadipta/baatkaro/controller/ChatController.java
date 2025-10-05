@@ -3,6 +3,7 @@ package org.arkadipta.baatkaro.controller;
 import org.arkadipta.baatkaro.dto.ChatMessage;
 import org.arkadipta.baatkaro.dto.MessageType;
 import org.arkadipta.baatkaro.entity.Message;
+import org.arkadipta.baatkaro.service.MessageBroadcastService;
 import org.arkadipta.baatkaro.service.MessageService;
 import org.arkadipta.baatkaro.service.RoomService;
 import org.arkadipta.baatkaro.service.UserService;
@@ -20,9 +21,10 @@ import java.util.UUID;
 
 /**
  * WebSocket Controller for real-time chat messaging
+ * Now with Redis pub-sub integration for multi-server scalability
+ * 
  * Note: This remains as @Controller (not @RestController) because it handles
- * WebSocket messages,
- * not HTTP REST requests
+ * WebSocket messages, not HTTP REST requests
  */
 @Controller
 public class ChatController {
@@ -41,8 +43,15 @@ public class ChatController {
     @Autowired
     private RoomService roomService;
 
+    @Autowired
+    private MessageBroadcastService broadcastService;
+
     /**
-     * Handle private messages
+     * Handle private messages - NEW IMPLEMENTATION
+     * Uses dedicated conversation topics instead of user queues for better
+     * real-time delivery
+     * Endpoint: /chat.private (unchanged from original)
+     * Now publishes to Redis for cross-server delivery
      */
     @MessageMapping("/chat.private")
     public void sendPrivateMessage(@Payload ChatMessage chatMessage,
@@ -75,13 +84,20 @@ public class ChatController {
             ChatMessage responseMessage = ChatMessage.createPrivateMessage(senderUsername, receiverUsername, content);
             responseMessage.setType(MessageType.PRIVATE);
 
-            // Send to receiver
-            messagingTemplate.convertAndSendToUser(receiverUsername, "/queue/messages", responseMessage);
+            // NEW APPROACH: Create consistent conversation ID and broadcast to dedicated
+            // topic
+            String conversationId = createConversationId(senderUsername, receiverUsername);
+            String conversationTopic = "/topic/private/" + conversationId;
 
-            // Send confirmation to sender (optional)
-            messagingTemplate.convertAndSendToUser(senderUsername, "/queue/messages", responseMessage);
+            // IMMEDIATE LOCAL DELIVERY: Broadcast to conversation topic for instant
+            // feedback
+            messagingTemplate.convertAndSend(conversationTopic, responseMessage);
 
-            logger.info("Private message saved and sent successfully. Message ID: {}", savedMessage.getId());
+            // CROSS-SERVER DELIVERY: Publish to Redis for other servers
+            broadcastService.publishPrivateMessage(responseMessage);
+
+            logger.info("Private message saved and published to conversation topic {}. Message ID: {}",
+                    conversationTopic, savedMessage.getId());
 
         } catch (Exception e) {
             logger.error("Error handling private message: {}", e.getMessage(), e);
@@ -89,7 +105,22 @@ public class ChatController {
     }
 
     /**
+     * Helper method to create consistent conversation IDs for private chats
+     * Ensures both users get the same conversation ID regardless of who initiated
+     */
+    private String createConversationId(String user1, String user2) {
+        // Sort usernames alphabetically to ensure consistent conversation ID
+        if (user1.compareTo(user2) <= 0) {
+            return user1 + "_" + user2;
+        } else {
+            return user2 + "_" + user1;
+        }
+    }
+
+    /**
      * Handle room messages
+     * Endpoint: /chat.sendMessage (unchanged from original)
+     * Now publishes to Redis for cross-server broadcasting
      */
     @MessageMapping("/chat.sendMessage")
     public void sendRoomMessage(@Payload ChatMessage chatMessage,
@@ -126,10 +157,13 @@ public class ChatController {
             // Create response message
             ChatMessage responseMessage = ChatMessage.createRoomMessage(senderUsername, roomId, roomName, content);
 
-            // Broadcast to all room participants
-            messagingTemplate.convertAndSend("/topic/" + roomId, responseMessage);
+            // IMMEDIATE LOCAL DELIVERY: Broadcast locally first for instant feedback
+            messagingTemplate.convertAndSend("/topic/room/" + roomId, responseMessage);
 
-            logger.info("Room message saved and broadcast successfully. Message ID: {}", savedMessage.getId());
+            // CROSS-SERVER DELIVERY: Publish to Redis for other servers
+            broadcastService.publishRoomMessage(responseMessage);
+
+            logger.info("Room message saved and published to Redis. Message ID: {}", savedMessage.getId());
 
         } catch (Exception e) {
             logger.error("Error handling room message: {}", e.getMessage(), e);
@@ -138,6 +172,8 @@ public class ChatController {
 
     /**
      * Handle user joining a room
+     * Endpoint: /chat.addUser (unchanged from original)
+     * Now publishes to Redis for cross-server notifications
      */
     @MessageMapping("/chat.addUser")
     public void addUser(@Payload ChatMessage chatMessage,
@@ -161,10 +197,13 @@ public class ChatController {
                 // Create join message
                 ChatMessage joinMessage = ChatMessage.createJoinMessage(username, roomId, roomName);
 
-                // Broadcast join notification to room
-                messagingTemplate.convertAndSend("/topic/" + roomId, joinMessage);
+                // IMMEDIATE LOCAL DELIVERY: Broadcast locally first for instant feedback
+                messagingTemplate.convertAndSend("/topic/room/" + roomId, joinMessage);
 
-                logger.info("User {} successfully joined room {} ({})", username, roomId, roomName);
+                // CROSS-SERVER DELIVERY: Publish to Redis for other servers
+                broadcastService.publishUserActivity(joinMessage);
+
+                logger.info("User {} join event published to Redis for room {} ({})", username, roomId, roomName);
             }
 
         } catch (Exception e) {
@@ -174,6 +213,8 @@ public class ChatController {
 
     /**
      * Handle user leaving a room
+     * Endpoint: /chat.removeUser (unchanged from original)
+     * Now publishes to Redis for cross-server notifications
      */
     @MessageMapping("/chat.removeUser")
     public void removeUser(@Payload ChatMessage chatMessage,
@@ -194,10 +235,13 @@ public class ChatController {
                 // Create leave message
                 ChatMessage leaveMessage = ChatMessage.createLeaveMessage(username, roomId, roomName);
 
-                // Broadcast leave notification to room
-                messagingTemplate.convertAndSend("/topic/" + roomId, leaveMessage);
+                // IMMEDIATE LOCAL DELIVERY: Broadcast locally first for instant feedback
+                messagingTemplate.convertAndSend("/topic/room/" + roomId, leaveMessage);
 
-                logger.info("User {} left room {} ({})", username, roomId, roomName);
+                // CROSS-SERVER DELIVERY: Publish to Redis for other servers
+                broadcastService.publishUserActivity(leaveMessage);
+
+                logger.info("User {} leave event published to Redis for room {} ({})", username, roomId, roomName);
             }
 
         } catch (Exception e) {
